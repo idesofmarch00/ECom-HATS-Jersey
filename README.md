@@ -24,6 +24,9 @@ JWT_SECRET_KEY=your_super_secret_jwt_key
 SESSION_KEY=your_session_secret
 MAIL_PASSWORD=your_gmail_app_password
 STRIPE_SERVER_KEY=your_stripe_secret_key
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
 ### 2. Run the Backend
