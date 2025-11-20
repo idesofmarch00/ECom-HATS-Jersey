@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, loginUser, checkAuth, resetPasswordRequest, resetPassword, logout } = require('../controller/Auth');
+const { createUser, loginUser, checkAuth, resetPasswordRequest, resetPassword, logout, sendOTP, loginUserWithOTP } = require('../controller/Auth');
 const passport = require('passport');
 
 const router = express.Router();
@@ -10,4 +10,8 @@ router.post('/signup', createUser)
 .get('/logout', logout)
 .post('/reset-password-request', resetPasswordRequest)
 .post('/reset-password', resetPassword)
+.post('/otp/send', sendOTP)
+.post('/otp/login', loginUserWithOTP);
+
 exports.router = router;
+

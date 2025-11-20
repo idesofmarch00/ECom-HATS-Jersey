@@ -126,3 +126,65 @@ exports.resetPassword = async (req, res) => {
     res.sendStatus(400);
   }
 };
+
+const { cacheGet, cacheSet, cacheDel } = require('../services/redis');
+
+exports.sendOTP = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) {
+      return res.status(400).json({ message: 'Phone number is required' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await cacheSet(`otp:${phone}`, otp, 300); // 5 minutes TTL
+
+    console.log('\n======================================');
+    console.log(`📱 [PHONE OTP] Verification code for ${phone}: ${otp}`);
+    console.log('======================================\n');
+
+    res.status(200).json({ success: true, message: 'OTP sent successfully', otp });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+exports.loginUserWithOTP = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ message: 'Phone and OTP are required' });
+    }
+
+    const cachedOtp = await cacheGet(`otp:${phone}`);
+    if (!cachedOtp || cachedOtp !== otp) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    // Invalidate OTP
+    await cacheDel(`otp:${phone}`);
+
+    // Check if user exists, else auto-register
+    let user = await User.findOne({ phone });
+    if (!user) {
+      user = new User({ phone, role: 'user' });
+      user = await user.save();
+    }
+
+    const token = jwt.sign(
+      sanitizeUser(user),
+      process.env.JWT_SECRET_KEY
+    );
+
+    res
+      .cookie('jwt', token, {
+        expires: new Date(Date.now() + 3600000),
+        httpOnly: true,
+      })
+      .status(201)
+      .json({ id: user.id, role: user.role });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
