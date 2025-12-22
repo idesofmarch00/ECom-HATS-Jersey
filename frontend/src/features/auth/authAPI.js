@@ -113,3 +113,46 @@ export function resetPassword(data) {
 
   });
 }
+
+export function sendOTP(phone) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch('/auth/otp/send', {
+        method: 'POST',
+        body: JSON.stringify({ phone }),
+        headers: { 'content-type': 'application/json' },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        resolve({ data });
+      } else {
+        const error = await response.json();
+        reject(error);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+export function loginUserWithOTP(phone, otp) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch('/auth/otp/login', {
+        method: 'POST',
+        body: JSON.stringify({ phone, otp }),
+        headers: { 'content-type': 'application/json' },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        resolve({ data });
+      } else {
+        const error = await response.json();
+        reject(error);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+

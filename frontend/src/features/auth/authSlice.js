@@ -6,6 +6,8 @@ import {
   checkAuth,
   resetPasswordRequest,
   resetPassword,
+  sendOTP,
+  loginUserWithOTP,
 } from './authAPI';
 import { updateUser } from '../user/userAPI';
 
@@ -86,6 +88,33 @@ export const signOutAsync = createAsyncThunk(
   }
 );
 
+export const sendOTPAsync = createAsyncThunk(
+  'user/sendOTP',
+  async (phone, { rejectWithValue }) => {
+    try {
+      const response = await sendOTP(phone);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const loginUserWithOTPAsync = createAsyncThunk(
+  'user/loginUserWithOTP',
+  async ({ phone, otp }, { rejectWithValue }) => {
+    try {
+      const response = await loginUserWithOTP(phone, otp);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+
 export const authSlice = createSlice({
   name: 'user',
   initialState,
@@ -146,6 +175,29 @@ export const authSlice = createSlice({
       .addCase(resetPasswordAsync.rejected, (state, action) => {
         state.status = 'idle';
         state.error = action.payload
+      })
+      .addCase(sendOTPAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(sendOTPAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.error = null;
+      })
+      .addCase(sendOTPAsync.rejected, (state, action) => {
+        state.status = 'idle';
+        state.error = action.payload;
+      })
+      .addCase(loginUserWithOTPAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(loginUserWithOTPAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.loggedInUserToken = action.payload;
+        state.error = null;
+      })
+      .addCase(loginUserWithOTPAsync.rejected, (state, action) => {
+        state.status = 'idle';
+        state.error = action.payload;
       })
   },
 });
