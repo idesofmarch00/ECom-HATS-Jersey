@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
+const http = require('http');
 const server = express();
+const httpServer = http.createServer(server);
 const mongoose = require('mongoose');
 const cors = require('cors');
 const session = require('express-session');
@@ -20,6 +22,8 @@ const authRouter = require('./routes/Auth');
 const cartRouter = require('./routes/Cart');
 const ordersRouter = require('./routes/Order');
 const uploadRouter = require('./routes/Upload');
+const bannerRouter = require('./routes/Banner');
+const { initSocket } = require('./services/socket');
 const { User } = require('./model/User');
 const { isAuth, sanitizeUser, cookieExtractor } = require('./services/common');
 const path = require('path');
@@ -71,7 +75,7 @@ server.post(
 
 const opts = {};
 opts.jwtFromRequest = cookieExtractor;
-opts.secretOrKey = process.env.JWT_SECRET_KEY; 
+opts.secretOrKey = process.env.JWT_SECRET_KEY;
 
 //middlewares
 
@@ -101,6 +105,8 @@ server.use('/auth', authRouter.router);
 server.use('/cart', isAuth(), cartRouter.router);
 server.use('/orders', isAuth(), ordersRouter.router);
 server.use('/upload', isAuth(), uploadRouter.router);
+server.use('/banners', bannerRouter.router);
+// Note: POST/DELETE /banners should check admin role — handled in controller or add isAuth() + admin check
 
 
 // this line we add to make react router work in case of other routes doesnt match
@@ -210,6 +216,9 @@ async function main() {
   console.log('database connected');
 }
 
-server.listen(process.env.PORT, () => {
-  console.log('server started');
+// Initialize Socket.io
+initSocket(httpServer);
+
+httpServer.listen(process.env.PORT, () => {
+  console.log(`🚀 Server started on port ${process.env.PORT}`);
 });

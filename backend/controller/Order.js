@@ -2,6 +2,7 @@ const { Order } = require("../model/Order");
 const { Product } = require("../model/Product");
 const { User } = require("../model/User");
 const { sendMail, invoiceTemplate } = require("../services/common");
+const { emitPurchaseNotification } = require("../services/socket");
 
 exports.fetchOrdersByUser = async (req, res) => {
     const { id } = req.user;
@@ -20,9 +21,11 @@ exports.fetchOrdersByUser = async (req, res) => {
     
     for(let item of order.items){
        let product =  await Product.findOne({_id:item.product.id})
-       product.$inc('stock',-1*item.quantity);
-       // for optimum performance we should make inventory outside of product.
-       await product.save()
+       if (product) {
+         product.$inc('stock',-1*item.quantity);
+         // for optimum performance we should make inventory outside of product.
+         await product.save()
+       }
     }
 
     try {
@@ -30,7 +33,18 @@ exports.fetchOrdersByUser = async (req, res) => {
       const user = await User.findById(order.user)
        // we can use await for this also 
        sendMail({to:user.email,html:invoiceTemplate(order),subject:'Order Received' })
-             
+       
+       // Emit Socket.io notification for social proof
+       try {
+         const city = order.selectedAddress?.city || 'somewhere';
+         for (let item of order.items) {
+           const productTitle = item.product?.title || 'a product';
+           emitPurchaseNotification({ productTitle, city });
+         }
+       } catch (socketErr) {
+         console.error('Socket notification failed:', socketErr);
+       }
+              
       res.status(201).json(doc);
     } catch (err) {
       res.status(400).json(err);
