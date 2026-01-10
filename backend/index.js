@@ -23,6 +23,7 @@ const cartRouter = require('./routes/Cart');
 const ordersRouter = require('./routes/Order');
 const uploadRouter = require('./routes/Upload');
 const bannerRouter = require('./routes/Banner');
+const whatsappRouter = require('./routes/Whatsapp');
 const { initSocket } = require('./services/socket');
 const { User } = require('./model/User');
 const { isAuth, sanitizeUser, cookieExtractor } = require('./services/common');
@@ -95,6 +96,7 @@ server.use(
   })
 );
 server.use(express.json()); // to parse req.body
+server.use(express.urlencoded({ extended: true })); // to parse urlencoded webhook bodies from Twilio
 
 server.use('/products', isAuth(), productsRouter.router);
 // we can also use JWT token for client-only auth
@@ -106,6 +108,7 @@ server.use('/cart', isAuth(), cartRouter.router);
 server.use('/orders', isAuth(), ordersRouter.router);
 server.use('/upload', isAuth(), uploadRouter.router);
 server.use('/banners', bannerRouter.router);
+server.use('/whatsapp-webhook', whatsappRouter.router);
 // Note: POST/DELETE /banners should check admin role — handled in controller or add isAuth() + admin check
 
 
