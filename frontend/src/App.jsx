@@ -33,6 +33,7 @@ import { positions, Provider } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
 import StripeCheckout from './pages/StripeCheckout';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import SocialProofToasts from './features/common/SocialProofToasts';
 
 const options = {
   timeout: 5000,
@@ -193,6 +194,7 @@ function App() {
         {userChecked && (
           <Provider template={AlertTemplate} {...options}>
             <RouterProvider router={router} />
+            <SocialProofToasts />
           </Provider>
         )}
         {/* Link must be inside the Provider */}

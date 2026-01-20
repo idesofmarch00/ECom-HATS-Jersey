@@ -12,6 +12,7 @@ import { addToCartAsync, selectItems } from '../../cart/cartSlice';
 import { selectLoggedInUser } from '../../auth/authSlice';
 import { useAlert } from 'react-alert';
 import { Grid } from 'react-loader-spinner';
+import { useViewerCount } from '../../common/useSocket';
 
 
 function classNames(...classes) {
@@ -28,6 +29,7 @@ export default function ProductDetail() {
   const params = useParams();
   const alert = useAlert();
   const status = useSelector(selectProductListStatus);
+  const viewerCount = useViewerCount(product?.id);
 
   const handleCart = (e) => {
     e.preventDefault();
@@ -154,9 +156,19 @@ export default function ProductDetail() {
               <p className="text-xl line-through tracking-tight text-gray-900">
                 ${product.price}
               </p>
-              <p className="text-3xl tracking-tight text-gray-900">
+              <p className="text-3xl font-bold tracking-tight text-indigo-600">
                 ${product.discountPrice}
               </p>
+
+              {viewerCount > 0 && (
+                <div className="mt-3 flex items-center gap-2 bg-rose-50 text-rose-700 px-3 py-1.5 rounded-lg text-xs font-semibold w-fit border border-rose-100 animate-pulse">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                  </span>
+                  <span>{viewerCount} {viewerCount === 1 ? 'person is' : 'people are'} viewing this hot item!</span>
+                </div>
+              )}
 
               {/* Reviews */}
               <div className="mt-6">
