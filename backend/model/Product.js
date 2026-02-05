@@ -17,6 +17,7 @@ const productSchema = new Schema({
     sizes:{ type : [Schema.Types.Mixed]},
     highlights:{ type : [String] },
     discountPrice: { type: Number},
+    embedding: { type: [Number] },
     deleted: { type : Boolean, default: false},
 })
 
