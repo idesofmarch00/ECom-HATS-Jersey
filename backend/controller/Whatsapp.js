@@ -148,6 +148,15 @@ exports.handleWhatsappWebhook = async (req, res) => {
       const finalDiscountPrice = Math.round(finalPrice * (1 - finalDiscountPercentage / 100));
 
       // 4. Create and Save the product
+      const { getEmbedding } = require('../services/embedding');
+      let embeddingVector = [];
+      try {
+        const textToEmbed = `${aiResult.title} ${aiResult.description} ${aiResult.brand || ''} ${aiResult.category || ''}`;
+        embeddingVector = await getEmbedding(textToEmbed);
+      } catch (embedErr) {
+        console.error('Failed to generate embedding in WhatsApp creation:', embedErr);
+      }
+
       const product = new Product({
         title: aiResult.title,
         description: aiResult.description,
@@ -161,7 +170,8 @@ exports.handleWhatsappWebhook = async (req, res) => {
         thumbnail: imageUrl,
         images: [imageUrl, imageUrl],
         colors: mapColors(aiResult.colors),
-        sizes: mapSizes(aiResult.sizes)
+        sizes: mapSizes(aiResult.sizes),
+        embedding: embeddingVector
       });
 
       const savedProduct = await product.save();
