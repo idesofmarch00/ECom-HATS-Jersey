@@ -10,6 +10,8 @@ import { useSelector } from 'react-redux';
 import { selectItems } from '../cart/cartSlice';
 import { selectLoggedInUser } from '../auth/authSlice';
 import { selectUserInfo } from '../user/userSlice';
+import styled from 'styled-components';
+import { useAppTheme } from '../../theme/ThemeContext';
 
 
 const navigation = [
@@ -24,9 +26,20 @@ const userNavigation = [
   { name: 'Sign out', link: '/logout' },
 ];
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
+const StyledNavContainer = styled(Disclosure)`
+  background-color: ${props => props.theme.mode === 'light' ? '#1F2937' : '#111827'} !important;
+  border-bottom: 1px solid ${props => props.theme.border};
+`;
+
+const StyledHeader = styled.header`
+  background-color: ${props => props.theme.surface} !important;
+  box-shadow: ${props => props.theme.shadow};
+  transition: all 0.3s ease;
+  
+  h1 {
+    color: ${props => props.theme.text} !important;
+  }
+`;
 
 function NavBar({ children }) {
   const items = useSelector(selectItems);
@@ -34,6 +47,7 @@ function NavBar({ children }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('search') || '');
+  const { themeMode, toggleTheme } = useAppTheme();
 
   useEffect(() => {
     setQuery(searchParams.get('search') || '');
@@ -51,7 +65,7 @@ function NavBar({ children }) {
   return (
     <>
       {userInfo &&<div className="min-h-full">
-        <Disclosure as="nav" className="bg-gray-800">
+        <StyledNavContainer as="nav">
           {({ open }) => (
             <>
               <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
@@ -121,6 +135,24 @@ function NavBar({ children }) {
                           </button>
                         </div>
                       </form>
+
+                      {/* Dynamic Light/Dark Theme Mode Toggle */}
+                      <button
+                        onClick={toggleTheme}
+                        type="button"
+                        className="mr-4 rounded-full p-1.5 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
+                        aria-label="Toggle theme mode"
+                      >
+                        {themeMode === 'light' ? (
+                          <svg className="h-5 w-5 text-gray-300 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5 text-yellow-400 hover:text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                          </svg>
+                        )}
+                      </button>
 
                       <Link to="/cart">
                         <button
@@ -253,6 +285,17 @@ function NavBar({ children }) {
                     </Disclosure.Button>
                   ))}
                 </div>
+                {/* Mobile Theme Toggle */}
+                <div className="flex items-center justify-between px-5 py-3 border-t border-gray-700">
+                  <span className="text-sm font-medium text-gray-300">Theme Mode</span>
+                  <button
+                    onClick={toggleTheme}
+                    type="button"
+                    className="rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-gray-300 hover:text-white"
+                  >
+                    {themeMode === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                  </button>
+                </div>
                 <div className="border-t border-gray-700 pb-3 pt-4">
                   <div className="flex items-center px-5">
                     <div className="flex-shrink-0">
@@ -306,13 +349,13 @@ function NavBar({ children }) {
           )}
         </Disclosure>
 
-        <header className="bg-white shadow">
+        <StyledHeader className="shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-              E-Commerce
+            <h1 className="text-3xl font-bold tracking-tight">
+              ECom HATS Jersey
             </h1>
           </div>
-        </header>
+        </StyledHeader>
         <main>
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             {children}
