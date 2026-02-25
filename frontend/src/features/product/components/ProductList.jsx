@@ -17,7 +17,7 @@ import {
   ChevronRightIcon,
   StarIcon,
 } from '@heroicons/react/20/solid';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   ChevronDownIcon,
   FunnelIcon,
@@ -63,6 +63,8 @@ export default function ProductList() {
   const [sort, setSort] = useState({});
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
 
   const handleFilter = (e, section, option) => {
     console.log(e.target.checked);
@@ -97,8 +99,12 @@ export default function ProductList() {
 
   useEffect(() => {
     const pagination = { _page: page, _limit: ITEMS_PER_PAGE };
-    dispatch(fetchProductsByFiltersAsync({ filter, sort, pagination }));
-  }, [dispatch, filter, sort, page]);
+    const activeFilter = { ...filter };
+    if (searchQuery) {
+      activeFilter.semanticSearch = searchQuery;
+    }
+    dispatch(fetchProductsByFiltersAsync({ filter: activeFilter, sort, pagination }));
+  }, [dispatch, filter, sort, page, searchQuery]);
 
   useEffect(() => {
     setPage(1);
@@ -121,9 +127,25 @@ export default function ProductList() {
 
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              All Products
-            </h1>
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                {searchQuery ? (
+                  <span>
+                    Semantic search: <span className="text-indigo-600 font-extrabold">"{searchQuery}"</span>
+                  </span>
+                ) : (
+                  'All Products'
+                )}
+              </h1>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchParams({})}
+                  className="text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors"
+                >
+                  Clear search ✕
+                </button>
+              )}
+            </div>
 
             <div className="flex items-center">
               <Menu as="div" className="relative inline-block text-left">
