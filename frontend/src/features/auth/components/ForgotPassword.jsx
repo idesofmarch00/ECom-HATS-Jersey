@@ -2,6 +2,51 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
 import { resetPasswordRequestAsync, selectMailSent } from '../authSlice';
+import styled from 'styled-components';
+
+const StyledForgotPage = styled.div`
+  background-color: ${props => props.theme.background} !important;
+  color: ${props => props.theme.text} !important;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  h2 {
+    color: ${props => props.theme.text} !important;
+  }
+
+  p {
+    color: ${props => props.theme.textMuted} !important;
+  }
+
+  label {
+    color: ${props => props.theme.text} !important;
+  }
+
+  input {
+    background-color: ${props => props.theme.surface} !important;
+    color: ${props => props.theme.text} !important;
+    border: 1px solid ${props => props.theme.border} !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+
+    &:focus {
+      border-color: ${props => props.theme.primary} !important;
+      box-shadow: 0 0 0 3px ${props => props.theme.glow} !important;
+    }
+  }
+`;
+
+const StyledForgotCard = styled.div`
+  background-color: ${props => props.theme.cardBg} !important;
+  border: 1px solid ${props => props.theme.border} !important;
+  box-shadow: ${props => props.theme.shadow} !important;
+  border-radius: 1rem;
+  padding: 2rem 1.5rem;
+  transition: all 0.3s ease;
+`;
 
 export default function ForgotPassword() {
 
@@ -17,19 +62,20 @@ export default function ForgotPassword() {
 
   return (
     <>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <StyledForgotPage className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-10 w-auto"
             src="/ecommerce.png"
             alt="Your Company"
           />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
             Enter email to reset password
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <StyledForgotCard>
           <form
             noValidate
             onSubmit={handleSubmit((data) => {
@@ -87,8 +133,9 @@ export default function ForgotPassword() {
               Login
             </Link>
           </p>
+          </StyledForgotCard>
         </div>
-      </div>
+      </StyledForgotPage>
     </>
   );
 }
