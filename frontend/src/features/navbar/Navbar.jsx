@@ -26,6 +26,10 @@ const userNavigation = [
   { name: 'Sign out', link: '/logout' },
 ];
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
+
 const StyledNavContainer = styled(Disclosure)`
   background-color: ${props => props.theme.mode === 'light' ? '#1F2937' : '#111827'} !important;
   border-bottom: 1px solid ${props => props.theme.border};
@@ -347,7 +351,7 @@ function NavBar({ children }) {
               </Disclosure.Panel>
             </>
           )}
-        </Disclosure>
+        </StyledNavContainer>
 
         <StyledHeader className="shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
