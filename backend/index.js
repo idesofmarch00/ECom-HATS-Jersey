@@ -113,7 +113,7 @@ server.use('/whatsapp-webhook', whatsappRouter.router);
 
 
 // this line we add to make react router work in case of other routes doesnt match
-server.get('*', (req, res) =>
+server.get('/*splat', (req, res) =>
   res.sendFile(path.resolve('build', 'index.html'))
 );
 
