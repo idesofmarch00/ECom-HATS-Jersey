@@ -4,6 +4,55 @@ import { useForm } from 'react-hook-form';
 import { selectLoggedInUser, createUserAsync } from '../authSlice';
 import { Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import styled from 'styled-components';
+
+const StyledSignupPage = styled.div`
+  background-color: ${props => props.theme.background} !important;
+  color: ${props => props.theme.text} !important;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  .bg-gray-50 {
+    background-color: ${props => props.theme.background} !important;
+  }
+
+  h2 {
+    color: ${props => props.theme.text} !important;
+  }
+
+  p {
+    color: ${props => props.theme.textMuted} !important;
+  }
+
+  label {
+    color: ${props => props.theme.text} !important;
+  }
+
+  input {
+    background-color: ${props => props.theme.surface} !important;
+    color: ${props => props.theme.text} !important;
+    border: 1px solid ${props => props.theme.border} !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+
+    &:focus {
+      border-color: ${props => props.theme.primary} !important;
+      box-shadow: 0 0 0 3px ${props => props.theme.glow} !important;
+    }
+  }
+`;
+
+const StyledSignupCard = styled.div`
+  background-color: ${props => props.theme.cardBg} !important;
+  border: 1px solid ${props => props.theme.border} !important;
+  box-shadow: ${props => props.theme.shadow} !important;
+  border-radius: 1rem;
+  padding: 2rem 1.5rem;
+  transition: all 0.3s ease;
+`;
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -19,19 +68,20 @@ export default function Signup() {
   return (
     <>
       {user && <Navigate to="/" replace={true}></Navigate>}
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+      <StyledSignupPage className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-10 w-auto"
             src="/ecommerce.png"
             alt="Your Company"
           />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
             Create a New Account
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <StyledSignupCard>
           <form
             noValidate
             className="space-y-6"
@@ -151,8 +201,9 @@ export default function Signup() {
               Log In
             </Link>
           </p>
+          </StyledSignupCard>
         </div>
-      </div>
+      </StyledSignupPage>
     </>
   );
 }
