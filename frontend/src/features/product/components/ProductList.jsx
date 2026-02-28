@@ -1,5 +1,6 @@
 import React, { useState, Fragment, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
 import {
   fetchBrandsAsync,
   fetchCategoriesAsync,
@@ -38,6 +39,58 @@ const sortOptions = [
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
+
+const StyledProductPage = styled.div`
+  background-color: ${props => props.theme.background};
+  color: ${props => props.theme.text};
+  transition: all 0.3s ease;
+`;
+
+const StyledProductCard = styled.div`
+  background-color: ${props => props.theme.cardBg};
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 1rem;
+  padding: 0.75rem;
+  box-shadow: ${props => props.theme.shadow};
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.3s ease;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px ${props => props.theme.glow};
+    border-color: ${props => props.theme.primary};
+  }
+`;
+
+const StyledProductTitle = styled.h3`
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  transition: color 0.2s ease;
+  
+  span {
+    color: ${props => props.theme.text};
+  }
+`;
+
+const StyledPriceLabel = styled.p`
+  font-size: 0.975rem;
+  font-weight: 700;
+  color: ${props => props.theme.primary};
+`;
+
+const StyledFilterContainer = styled.div`
+  background-color: ${props => props.theme.cardBg};
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: ${props => props.theme.shadow};
+  transition: all 0.3s ease;
+`;
 
 export default function ProductList() {
   const dispatch = useDispatch();
@@ -116,7 +169,7 @@ export default function ProductList() {
   }, []);
 
   return (
-    <div className="bg-white">
+    <StyledProductPage>
       <div>
         <MobileFilter
           handleFilter={handleFilter}
@@ -238,7 +291,7 @@ export default function ProductList() {
           ></Pagination>
         </main>
       </div>
-    </div>
+    </StyledProductPage>
   );
 }
 
@@ -363,7 +416,7 @@ function MobileFilter({
 
 function DesktopFilter({ handleFilter, filters }) {
   return (
-    <form className="hidden lg:block">
+    <StyledFilterContainer className="hidden lg:block space-y-4">
       {filters.map((section) => (
         <Disclosure
           as="div"
@@ -413,70 +466,72 @@ function DesktopFilter({ handleFilter, filters }) {
           )}
         </Disclosure>
       ))}
-    </form>
+    </StyledFilterContainer>
   );
 }
 
 function ProductGrid({ products, status }) {
   return (
-    <div className="bg-white">
+    <div className="w-full">
       <div className="mx-auto max-w-2xl px-4 py-0 sm:px-6 sm:py-0 lg:max-w-7xl lg:px-8">
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
           {status === 'loading' ? (
-            <Grid
-              height="80"
-              width="80"
-              color="rgb(79, 70, 229) "
-              ariaLabel="grid-loading"
-              radius="12.5"
-              wrapperStyle={{}}
-              wrapperClass=""
-              visible={true}
-            />
+            <div className="col-span-full flex justify-center py-12">
+              <Grid
+                height="80"
+                width="80"
+                color="rgb(79, 70, 229)"
+                ariaLabel="grid-loading"
+                radius="12.5"
+                visible={true}
+              />
+            </div>
           ) : null}
           {products.map((product) => (
-            <Link to={`/product-detail/${product.id}`} key={product.id}>
-              <div className="group relative border-solid border-2 p-2 border-gray-200">
-                <div className="min-h-60 aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-60">
+            <Link to={`/product-detail/${product.id}`} key={product.id} className="block h-full">
+              <StyledProductCard className="group relative">
+                <div className="min-h-60 aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-800 lg:aspect-none group-hover:opacity-90 lg:h-60 transition-opacity">
                   <img
                     src={product.thumbnail}
                     alt={product.title}
                     className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                   />
                 </div>
-                <div className="mt-4 flex justify-between">
-                  <div>
-                    <h3 className="text-sm text-gray-700">
-                      <div href={product.thumbnail}>
+                <div className="mt-4 flex justify-between flex-1 flex-col">
+                  <div className="mb-2">
+                    <StyledProductTitle className="text-sm font-semibold">
+                      <div>
                         <span aria-hidden="true" className="absolute inset-0" />
                         {product.title}
                       </div>
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      <StarIcon className="w-6 h-6 inline"></StarIcon>
-                      <span className=" align-bottom">{product.rating}</span>
+                    </StyledProductTitle>
+                    <p className="mt-1 text-xs text-yellow-500 flex items-center gap-1 font-medium">
+                      <StarIcon className="w-4 h-4 inline fill-current"></StarIcon>
+                      <span>{product.rating}</span>
                     </p>
                   </div>
-                  <div>
-                    <p className="text-sm block font-medium text-gray-900">
-                      ${product.discountPrice}
-                    </p>
-                    <p className="text-sm block line-through font-medium text-gray-400">
-                      ${product.price}
-                    </p>
+                  <div className="mt-auto flex items-baseline justify-between border-t border-dashed border-gray-200 dark:border-gray-700 pt-2">
+                    <div>
+                      <StyledPriceLabel className="text-sm block font-bold">
+                        ${product.discountPrice}
+                      </StyledPriceLabel>
+                      <p className="text-xs block line-through font-medium text-gray-400">
+                        ${product.price}
+                      </p>
+                    </div>
+                    {product.deleted && (
+                      <span className="text-[10px] bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-bold">
+                        Deleted
+                      </span>
+                    )}
+                    {product.stock <= 0 && (
+                      <span className="text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold animate-pulse">
+                        Out of Stock
+                      </span>
+                    )}
                   </div>
                 </div>
-                {product.deleted && (
-                  <div>
-                    <p className="text-sm text-red-400">product deleted</p>
-                  </div>
-                )}
-                {product.stock <= 0 && (
-                  <div>
-                    <p className="text-sm text-red-400">out of stock</p>
-                  </div>
-                )}
-              </div>
+              </StyledProductCard>
             </Link>
           ))}
         </div>

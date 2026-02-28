@@ -12,6 +12,7 @@ import { addToCartAsync, selectItems } from '../../cart/cartSlice';
 import { selectLoggedInUser } from '../../auth/authSlice';
 import { useAlert } from 'react-alert';
 import { Grid } from 'react-loader-spinner';
+import styled from 'styled-components';
 import { useViewerCount } from '../../common/useSocket';
 
 
@@ -19,6 +20,54 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
+
+const StyledDetailPage = styled.div`
+  background-color: ${props => props.theme.background} !important;
+  color: ${props => props.theme.text} !important;
+  transition: all 0.3s ease;
+
+  .bg-white {
+    background-color: ${props => props.theme.background} !important;
+  }
+
+  h1, h2, h3, h4, .text-gray-900 {
+    color: ${props => props.theme.text} !important;
+  }
+
+  p, .text-gray-600, .text-gray-500, .text-gray-400 {
+    color: ${props => props.theme.textMuted} !important;
+  }
+
+  ol, li, a {
+    color: ${props => props.theme.textMuted} !important;
+    &:hover {
+      color: ${props => props.theme.primary} !important;
+    }
+  }
+
+  button[type="submit"] {
+    background-color: ${props => props.theme.primary} !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: ${props => props.theme.primaryHover} !important;
+    }
+  }
+
+  /* Size Options and labels adaptation */
+  .bg-white.text-gray-900 {
+    background-color: ${props => props.theme.surface} !important;
+    color: ${props => props.theme.text} !important;
+    border-color: ${props => props.theme.border} !important;
+  }
+
+  .cursor-not-allowed {
+    background-color: ${props => props.theme.surfaceMuted} !important;
+    color: ${props => props.theme.textMuted} !important;
+    opacity: 0.5;
+  }
+`;
 
 export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState();
@@ -56,7 +105,7 @@ export default function ProductDetail() {
   }, [dispatch, params.id]);
 
   return (
-    <div className="bg-white">
+    <StyledDetailPage className="bg-white">
       {status === 'loading' ? (
         <Grid
           height="80"
@@ -376,6 +425,6 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
-    </div>
+    </StyledDetailPage>
   );
 }

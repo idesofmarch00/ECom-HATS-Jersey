@@ -4,6 +4,89 @@ import { selectError, selectLoggedInUser, sendOTPAsync, loginUserWithOTPAsync } 
 import { Link, Navigate } from 'react-router-dom';
 import { loginUserAsync } from '../authSlice';
 import { useForm } from 'react-hook-form';
+import styled from 'styled-components';
+
+const StyledLoginPage = styled.div`
+  background-color: ${props => props.theme.background} !important;
+  color: ${props => props.theme.text} !important;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  .bg-gray-50 {
+    background-color: ${props => props.theme.background} !important;
+  }
+
+  h2 {
+    color: ${props => props.theme.text} !important;
+  }
+
+  p {
+    color: ${props => props.theme.textMuted} !important;
+  }
+
+  label {
+    color: ${props => props.theme.text} !important;
+  }
+
+  input {
+    background-color: ${props => props.theme.surface} !important;
+    color: ${props => props.theme.text} !important;
+    border: 1px solid ${props => props.theme.border} !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+
+    &:focus {
+      border-color: ${props => props.theme.primary} !important;
+      box-shadow: 0 0 0 3px ${props => props.theme.glow} !important;
+    }
+  }
+
+  /* Success/Error blocks */
+  .bg-emerald-50 {
+    background-color: ${props => props.theme.mode === 'light' ? '#ECFDF5' : '#064E3B'} !important;
+    color: ${props => props.theme.mode === 'light' ? '#065F46' : '#A7F3D0'} !important;
+    border-color: ${props => props.theme.mode === 'light' ? '#D1FAE5' : '#047857'} !important;
+  }
+`;
+
+const StyledLoginCard = styled.div`
+  background-color: ${props => props.theme.cardBg} !important;
+  border: 1px solid ${props => props.theme.border} !important;
+  box-shadow: ${props => props.theme.shadow} !important;
+  border-radius: 1rem;
+  padding: 2rem 1.5rem;
+  transition: all 0.3s ease;
+`;
+
+const StyledTabContainer = styled.div`
+  background-color: ${props => props.theme.surfaceMuted} !important;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  display: flex;
+  margin-bottom: 2rem;
+`;
+
+const StyledTabButton = styled.button`
+  width: 100%;
+  padding: 0.625rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  background-color: ${props => props.active ? props.theme.surface : 'transparent'} !important;
+  color: ${props => props.active ? props.theme.primary : props.theme.textMuted} !important;
+  box-shadow: ${props => props.active ? props.theme.shadow : 'none'} !important;
+
+  &:hover {
+    color: ${props => props.theme.text} !important;
+  }
+`;
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -56,7 +139,7 @@ export default function Login() {
   return (
     <>
       {user && <Navigate to="/" replace={true}></Navigate>}
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
+      <StyledLoginPage className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-16 w-auto object-contain"
@@ -72,38 +155,30 @@ export default function Login() {
           </p>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md bg-white py-8 px-6 shadow-xl rounded-xl border border-gray-100">
+        <StyledLoginCard className="mt-10 sm:mx-auto sm:w-full sm:max-w-md bg-white py-8 px-6 shadow-xl rounded-xl border border-gray-100">
           {/* Tab Switcher */}
-          <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-8" role="tablist" aria-label="Tabs">
-            <button
+          <StyledTabContainer role="tablist" aria-label="Tabs">
+            <StyledTabButton
               type="button"
+              active={loginMethod === 'email'}
               onClick={() => {
                 setLoginMethod('email');
                 setLocalError('');
               }}
-              className={`w-full py-2.5 text-sm font-semibold rounded-md transition-all duration-200 ${
-                loginMethod === 'email'
-                  ? 'bg-white text-indigo-700 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
-              }`}
             >
               Email & Password
-            </button>
-            <button
+            </StyledTabButton>
+            <StyledTabButton
               type="button"
+              active={loginMethod === 'phone'}
               onClick={() => {
                 setLoginMethod('phone');
                 setLocalError('');
               }}
-              className={`w-full py-2.5 text-sm font-semibold rounded-md transition-all duration-200 ${
-                loginMethod === 'phone'
-                  ? 'bg-white text-indigo-700 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
-              }`}
             >
               Phone & OTP
-            </button>
-          </div>
+            </StyledTabButton>
+          </StyledTabContainer>
 
           {loginMethod === 'email' ? (
             <form
@@ -274,8 +349,8 @@ export default function Login() {
               Create an Account
             </Link>
           </p>
-        </div>
-      </div>
+        </StyledLoginCard>
+      </StyledLoginPage>
     </>
   );
 }
