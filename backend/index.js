@@ -28,6 +28,7 @@ const { initSocket } = require('./services/socket');
 const { User } = require('./model/User');
 const { isAuth, sanitizeUser, cookieExtractor } = require('./services/common');
 const path = require('path');
+const mongoSanitize = require('./middleware/sanitize');
 const { Order } = require('./model/Order');
 const { env } = require('process');
 
@@ -96,6 +97,7 @@ server.use(
   })
 );
 server.use(express.json()); // to parse req.body
+server.use(mongoSanitize);
 server.use(express.urlencoded({ extended: true })); // to parse urlencoded webhook bodies from Twilio
 
 server.use('/products', isAuth(), productsRouter.router);

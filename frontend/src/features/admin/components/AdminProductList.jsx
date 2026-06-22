@@ -59,6 +59,53 @@ export default function AdminProductList() {
   const [sort, setSort] = useState({});
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [stockFile, setStockFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState('');
+
+  const handleExportCatalog = async () => {
+    try {
+      const response = await fetch('/products/export');
+      const data = await response.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'catalog_export.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
+  };
+
+  const handleStockUpload = async () => {
+    if (!stockFile) {
+      setUploadStatus('Please select a file first.');
+      return;
+    }
+    try {
+      setUploadStatus('Uploading...');
+      const text = await stockFile.text();
+      const parsed = JSON.parse(text);
+      const updates = Array.isArray(parsed) ? parsed : parsed.updates || [];
+      const response = await fetch('/products/bulk-stock', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates }),
+      });
+      if (response.ok) {
+        setUploadStatus('Stock updated successfully!');
+        setStockFile(null);
+      } else {
+        const errData = await response.json();
+        setUploadStatus(`Upload failed: ${errData.message || response.statusText}`);
+      }
+    } catch (error) {
+      setUploadStatus(`Upload error: ${error.message}`);
+    }
+  };
   const handleFilter = (e, section, option) => {
     console.log(e.target.checked);
     const newFilter = { ...filter };
@@ -197,13 +244,48 @@ export default function AdminProductList() {
               {/* Product grid */}
 
               <div className="lg:col-span-3">
-                <div>
-                  <Link
-                    to="/admin/product-form"
-                    className="rounded-md mx-10 my-5 bg-green-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  >
-                    Add New Product
-                  </Link>
+                <div className="mx-10 my-5 space-y-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Link
+                      to="/admin/product-form"
+                      className="rounded-md bg-green-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    >
+                      Add New Product
+                    </Link>
+                    <button
+                      onClick={handleExportCatalog}
+                      className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                    >
+                      Export Catalog to Excel
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <input
+                      type="file"
+                      accept=".json,.csv"
+                      onChange={(e) => setStockFile(e.target.files[0] || null)}
+                      className="text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
+                    />
+                    <button
+                      onClick={handleStockUpload}
+                      className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    >
+                      Upload Stock CSV
+                    </button>
+                    {uploadStatus && (
+                      <span
+                        className={`text-sm font-medium ${
+                          uploadStatus.includes('successfully')
+                            ? 'text-green-600'
+                            : uploadStatus.includes('Uploading')
+                            ? 'text-blue-600'
+                            : 'text-red-600'
+                        }`}
+                      >
+                        {uploadStatus}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <ProductGrid products={products}></ProductGrid>
               </div>
